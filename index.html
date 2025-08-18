@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senior College Counseling Checklist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .section-header {
+            transition: color 0.3s ease;
+        }
+        .section-header:hover {
+            color: #2563eb;
+        }
+        .custom-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            height: 1.25rem;
+            width: 1.25rem;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            display: inline-block;
+            position: relative;
+            cursor: pointer;
+        }
+        .custom-checkbox:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        .custom-checkbox:checked::after {
+            content: '\2713';
+            font-size: 0.8rem;
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* Loading Spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 8px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+        <!-- Header Section -->
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-900">Senior College Application Meeting</h1>
+            <p class="text-md text-gray-600 mt-1">A comprehensive checklist for our 1-on-1 meeting.</p>
+        </header>
+
+        <!-- Student Info Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="studentName" class="block text-sm font-medium text-gray-700">Student Name</label>
+                    <input type="text" id="studentName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" placeholder="e.g., Jane Doe">
+                </div>
+                <div>
+                    <label for="meetingDate" class="block text-sm font-medium text-gray-700">Meeting Date</label>
+                    <input type="date" id="meetingDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 1: Foundational Items -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 1: Foundational Items & Logistics</h2>
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <input id="standingMeeting" type="checkbox" class="custom-checkbox mt-1">
+                    <div class="ml-3">
+                        <label for="standingMeeting" class="font-medium text-gray-800">Standing Senior Meeting Scheduled</label>
+                    </div>
+                </div>
+                <div class="flex items-start">
+                    <input id="commonAppShared" type="checkbox" class="custom-checkbox mt-1">
+                    <div class="ml-3">
+                        <label for="commonAppShared" class="font-medium text-gray-800">Common App Preview Enabled</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 2: College List & Deadlines -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 2: College List & Deadlines</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">College Name</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deadline Type</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="collegeList" class="bg-white divide-y divide-gray-200">
+                        <!-- JS will populate this -->
+                    </tbody>
+                </table>
+            </div>
+            <button id="addCollegeBtn" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                Add College
+            </button>
+        </div>
+
+        <!-- Part 3: Standardized Testing -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 3: Standardized Testing (SAT/ACT)</h2>
+            <div class="space-y-4">
+                <div>
+                    <span class="font-medium">Testing Status:</span>
+                    <label class="ml-4"><input type="radio" name="testingStatus" value="Complete" class="mr-1"> Complete</label>
+                    <label class="ml-4"><input type="radio" name="testingStatus" value="Planning to test again" class="mr-1"> Planning to test again</label>
+                </div>
+                <div class="flex items-start">
+                    <input id="sendScores" type="checkbox" class="custom-checkbox mt-1">
+                    <label for="sendScores" class="ml-3 font-medium text-gray-800">Action Item: Send official scores to required colleges by:</label>
+                    <input type="date" class="ml-2 rounded-md border-gray-300 shadow-sm sm:text-sm">
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 4: Letters of Recommendation -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 4: Letters of Recommendation (LORs)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <input type="text" id="recommender1" placeholder="Recommender 1 Name & Subject" class="rounded-md border-gray-300 shadow-sm">
+                <input type="text" id="recommender2" placeholder="Recommender 2 Name & Subject" class="rounded-md border-gray-300 shadow-sm">
+            </div>
+            <div class="space-y-2">
+                <div class="flex items-center"><input type="checkbox" class="custom-checkbox mr-3"><label>Provided "Brag Sheet" & resume to recommenders.</label></div>
+                <div class="flex items-center"><input type="checkbox" class="custom-checkbox mr-3"><label>Assigned recommenders in application portal.</label></div>
+            </div>
+        </div>
+        
+        <!-- Part 5: Essays -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 5: Essays</h2>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <label for="essayStatus" class="font-medium">Main Personal Statement Status:</label>
+                    <select id="essayStatus" class="ml-2 rounded-md border-gray-300 shadow-sm">
+                        <option>Not Started</option>
+                        <option>Brainstorming</option>
+                        <option>Outlining</option>
+                        <option>First Draft</option>
+                        <option>Revising</option>
+                        <option>Near Final</option>
+                    </select>
+                    <button id="generateIdeasBtn" class="ml-4 inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+                        ✨ Generate Essay Ideas
+                    </button>
+                </div>
+                 <div class="flex items-start">
+                    <input id="shareDraft" type="checkbox" class="custom-checkbox mt-1">
+                    <label for="shareDraft" class="ml-3 font-medium text-gray-800">Action Item: Share current draft for feedback by:</label>
+                    <input type="date" class="ml-2 rounded-md border-gray-300 shadow-sm sm:text-sm">
+                </div>
+                <div class="flex items-start">
+                    <input id="trackSupplements" type="checkbox" class="custom-checkbox mt-1">
+                    <label for="trackSupplements" class="ml-3 font-medium text-gray-800">Action Item: Create master spreadsheet for supplemental essays.</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 6: Other Action Items -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 6: Other Application Components</h2>
+            <div class="space-y-3">
+                <div class="flex items-center"><input type="checkbox" class="custom-checkbox mr-3"><label>Review Activities List for clarity and impact.</label></div>
+                <div class="flex items-center"><input type="checkbox" class="custom-checkbox mr-3"><label>Family to begin gathering Financial Aid documents (FAFSA/CSS).</label></div>
+                <div class="flex items-center"><input type="checkbox" class="custom-checkbox mr-3"><label>Confirm Portfolio/Audition deadlines (if applicable).</label></div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Summary & Next Steps</h2>
+             <div class="space-y-4">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <label class="block font-medium">Top 3 Priorities Before Next Meeting:</label>
+                        <button id="suggestPrioritiesBtn" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+                            ✨ Suggest Priorities
+                        </button>
+                    </div>
+                    <textarea id="priorities" rows="4" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="1. Finalize ED choice...&#10;2. Send SAT scores...&#10;3. Complete first draft of main essay..."></textarea>
+                </div>
+                <div>
+                    <label for="nextMeetingDate" class="block font-medium">Next Meeting Scheduled for:</label>
+                    <input type="date" id="nextMeetingDate" class="mt-1 rounded-md border-gray-300 shadow-sm">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Print Button -->
+        <div class="mt-8 text-center">
+            <button onclick="window.print()" class="px-6 py-2 bg-gray-700 text-white font-semibold rounded-lg shadow-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-75">
+                Print / Save as PDF
+            </button>
+        </div>
+
+    </div>
+
+    <!-- Modal for displaying results or errors -->
+    <div id="modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="modalTitle" class="text-lg font-bold mb-4"></h3>
+            <div id="modalBody" class="text-gray-700"></div>
+            <button id="closeModal" class="mt-6 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Close</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Element references
+            const addCollegeBtn = document.getElementById('addCollegeBtn');
+            const collegeListBody = document.getElementById('collegeList');
+            const generateIdeasBtn = document.getElementById('generateIdeasBtn');
+            const suggestPrioritiesBtn = document.getElementById('suggestPrioritiesBtn');
+            const modal = document.getElementById('modal');
+            const closeModalBtn = document.getElementById('closeModal');
+
+            // --- Utility Functions ---
+            
+            /**
+             * Shows a modal with a given title and message.
+             * @param {string} title - The title for the modal.
+             * @param {string} message - The body content for the modal (can be HTML).
+             */
+            const showModal = (title, message) => {
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalBody').innerHTML = message;
+                modal.classList.remove('hidden');
+            };
+
+            /**
+             * Hides the modal.
+             */
+            const hideModal = () => {
+                modal.classList.add('hidden');
+            };
+            closeModalBtn.addEventListener('click', hideModal);
+
+            /**
+             * Toggles a loading state on a button.
+             * @param {HTMLElement} button - The button element.
+             * @param {boolean} isLoading - Whether to show or hide the loader.
+             */
+            const setLoadingState = (button, isLoading) => {
+                if (isLoading) {
+                    button.disabled = true;
+                    button.innerHTML += '<span class="loader"></span>';
+                } else {
+                    button.disabled = false;
+                    const loader = button.querySelector('.loader');
+                    if (loader) loader.remove();
+                }
+            };
+            
+            // --- Gemini API Call ---
+            
+            /**
+             * Calls the Gemini API with a given prompt and handles retries with exponential backoff.
+             * @param {string} prompt - The prompt to send to the model.
+             * @returns {Promise<string>} - The generated text from the model.
+             */
+            const callGeminiAPI = async (prompt) => {
+                const apiKey = ""; // API key will be provided by the environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{
+                        role: "user",
+                        parts: [{ text: prompt }]
+                    }]
+                };
+
+                let response;
+                let attempts = 0;
+                const maxAttempts = 5;
+                let delay = 1000; // Start with 1 second
+
+                while (attempts < maxAttempts) {
+                    try {
+                        response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (response.ok) {
+                            const result = await response.json();
+                             if (result.candidates && result.candidates.length > 0 &&
+                                result.candidates[0].content && result.candidates[0].content.parts &&
+                                result.candidates[0].content.parts.length > 0) {
+                                return result.candidates[0].content.parts[0].text;
+                            } else {
+                                throw new Error("Invalid response structure from API.");
+                            }
+                        } else if (response.status === 429 || response.status >= 500) {
+                            // Throttling or server error, so retry
+                            console.warn(`API call failed with status ${response.status}. Retrying in ${delay}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            delay *= 2; // Double the delay for the next attempt
+                            attempts++;
+                        } else {
+                            // Other client-side error, don't retry
+                            const errorResult = await response.json();
+                            throw new Error(`API Error: ${errorResult.error?.message || response.statusText}`);
+                        }
+                    } catch (error) {
+                        if (attempts >= maxAttempts - 1) {
+                            console.error("API call failed after multiple retries:", error);
+                            throw error; // Re-throw the error after final attempt
+                        }
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                        attempts++;
+                    }
+                }
+                throw new Error("API call failed after all retries.");
+            };
+
+            // --- Feature Logic ---
+
+            /**
+             * Handles the "Generate Essay Ideas" button click.
+             */
+            const handleGenerateIdeas = async () => {
+                const studentName = document.getElementById('studentName').value || 'a student';
+                const collegeInputs = Array.from(document.querySelectorAll('#collegeList input[type="text"]'));
+                const collegeNames = collegeInputs.map(input => input.value).filter(name => name.trim() !== '');
+
+                if (collegeNames.length === 0) {
+                    showModal("Missing Information", "Please enter at least one college name in the list before generating ideas.");
+                    return;
+                }
+
+                const prompt = `Generate 3 unique and compelling Common App personal statement ideas for a high school senior named ${studentName} who is applying to colleges like ${collegeNames.join(', ')}. The ideas should be distinct, encourage personal storytelling, and be presented as a numbered list.`;
+
+                setLoadingState(generateIdeasBtn, true);
+                try {
+                    const result = await callGeminiAPI(prompt);
+                    const formattedResult = result.replace(/\n/g, '<br>'); // Format for HTML display
+                    showModal("✨ Generated Essay Ideas", formattedResult);
+                } catch (error) {
+                    showModal("Error", "Could not generate essay ideas. Please try again later.");
+                    console.error(error);
+                } finally {
+                    setLoadingState(generateIdeasBtn, false);
+                }
+            };
+
+            /**
+             * Handles the "Suggest Priorities" button click.
+             */
+            const handleSuggestPriorities = async () => {
+                const essayStatus = document.getElementById('essayStatus').value;
+                const testingStatus = document.querySelector('input[name="testingStatus"]:checked')?.value || 'not specified';
+                const recommender1 = document.getElementById('recommender1').value;
+                const recommender2 = document.getElementById('recommender2').value;
+                let recommenderInfo = "has not entered any recommenders yet";
+                if (recommender1 || recommender2) {
+                    recommenderInfo = "has started adding recommenders";
+                }
+
+                const prompt = `A high school senior is working on their college applications. Their personal statement status is "${essayStatus}". Their standardized testing status is "${testingStatus}". The student ${recommenderInfo}. Based on this information, suggest 3 clear, actionable priorities for them to focus on before their next counseling meeting. Present them as a numbered list with brief explanations.`;
+
+                setLoadingState(suggestPrioritiesBtn, true);
+                try {
+                    const result = await callGeminiAPI(prompt);
+                    document.getElementById('priorities').value = result;
+                } catch (error) {
+                    showModal("Error", "Could not suggest priorities. Please try again later.");
+                    console.error(error);
+                } finally {
+                    setLoadingState(suggestPrioritiesBtn, false);
+                }
+            };
+
+            // --- Initial Setup ---
+            
+            // Set meeting date to today by default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('meetingDate').value = today;
+
+            const createCollegeRow = () => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-2 whitespace-nowrap"><input type="text" placeholder="University Name" class="w-full rounded-md border-gray-300 shadow-sm text-sm college-name-input"></td>
+                    <td class="px-4 py-2 whitespace-nowrap"><input type="text" placeholder="Common App" class="w-full rounded-md border-gray-300 shadow-sm text-sm"></td>
+                    <td class="px-4 py-2 whitespace-nowrap">
+                        <select class="w-full rounded-md border-gray-300 shadow-sm text-sm">
+                            <option>RD</option><option>ED</option><option>EA</option><option>REA</option><option>Rolling</option>
+                        </select>
+                    </td>
+                    <td class="px-4 py-2 whitespace-nowrap"><input type="date" class="w-full rounded-md border-gray-300 shadow-sm text-sm"></td>
+                    <td class="px-4 py-2 text-right">
+                        <button class="remove-college-btn text-red-500 hover:text-red-700 font-semibold">Remove</button>
+                    </td>
+                `;
+                collegeListBody.appendChild(row);
+
+                row.querySelector('.remove-college-btn').addEventListener('click', function() {
+                    this.closest('tr').remove();
+                });
+            };
+
+            // Add initial rows
+            createCollegeRow();
+            createCollegeRow();
+
+            // Event Listeners
+            addCollegeBtn.addEventListener('click', createCollegeRow);
+            generateIdeasBtn.addEventListener('click', handleGenerateIdeas);
+            suggestPrioritiesBtn.addEventListener('click', handleSuggestPriorities);
+        });
+    </script>
+</body>
+</html>
