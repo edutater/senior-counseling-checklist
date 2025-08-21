@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senior College Counseling Checklist (Google Integrated)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .section-header:hover { color: #2563eb; }
+        .custom-checkbox { appearance: none; -webkit-appearance: none; height: 1.25rem; width: 1.25rem; background-color: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.25rem; display: inline-block; position: relative; cursor: pointer; }
+        .custom-checkbox:checked { background-color: #3b82f6; border-color: #3b82f6; }
+        .custom-checkbox:checked::after { content: '\2713'; font-size: 0.8rem; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: white; padding: 2rem; border-radius: 0.5rem; max-width: 500px; width: 90%; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; display: inline-block; margin-left: 8px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-900">Senior College Application Meeting</h1>
+            <p class="text-md text-gray-600 mt-1">A comprehensive checklist for our 1-on-1 meeting.</p>
+        </header>
+
+        <!-- Auth and Settings Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2">Step 1: Connect & Configure</h2>
+            <div class="flex items-center mb-4">
+                <button id="authorize_button" class="bg-blue-600 text-white px-4 py-2 rounded-md font-semibold">Sign in with Google</button>
+                <button id="signout_button" class="ml-4 bg-gray-200 text-gray-800 px-4 py-2 rounded-md font-semibold hidden">Sign Out</button>
+            </div>
+            <div id="settings_panel" class="grid grid-cols-1 md:grid-cols-2 gap-4 hidden">
+                <div>
+                    <label for="sheetId" class="block text-sm font-medium text-gray-700">Google Sheet ID</label>
+                    <input type="text" id="sheetId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="Paste Sheet ID here">
+                </div>
+                <div>
+                    <label for="driveFolderId" class="block text-sm font-medium text-gray-700">Google Drive Folder ID</label>
+                    <input type="text" id="driveFolderId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="Paste Folder ID here">
+                </div>
+            </div>
+        </div>
+
+        <!-- Student Info Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+             <h2 class="text-xl font-semibold mb-4 border-b pb-2">Step 2: Fill Out Form</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label for="studentName" class="block text-sm font-medium text-gray-700">Student Name</label>
+                    <input type="text" id="studentName" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="e.g., Jane Doe">
+                </div>
+                <div>
+                    <label for="meetingDate" class="block text-sm font-medium text-gray-700">Meeting Date</label>
+                    <input type="date" id="meetingDate" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                </div>
+            </div>
+             <div class="mt-4 flex items-center">
+                <input id="isAthlete" type="checkbox" class="custom-checkbox">
+                <label for="isAthlete" class="ml-3 font-medium text-gray-800">Recruited Student-Athlete</label>
+            </div>
+        </div>
+
+        <!-- Part 1: Student Check-in -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 1: Student Check-in</h2>
+            <textarea id="checkin" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="How are you feeling? Any updates, stresses, or wins to share?"></textarea>
+        </div>
+        
+        <!-- The rest of the form sections remain the same as the previous version -->
+        <!-- Part 2: Logistics -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 2: Logistics</h2>
+            <div class="flex items-start">
+                <input id="standingMeeting" type="checkbox" class="custom-checkbox mt-1">
+                <label for="standingMeeting" class="ml-3 font-medium text-gray-800">Standing Senior Meeting Scheduled</label>
+            </div>
+        </div>
+
+        <!-- Part 3: Common App -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 3: Common Application</h2>
+            <div class="space-y-3">
+                <div class="flex items-center"><input id="commonAppPreview" type="checkbox" class="custom-checkbox mr-3"><label>Common App Preview Enabled</label></div>
+                <div class="flex items-center"><input id="commonAppSections" type="checkbox" class="custom-checkbox mr-3"><label>Reviewed Application Sections (Profile, Family, Education, etc.)</label></div>
+            </div>
+        </div>
+
+        <!-- Part 4: Standardized Testing -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 4: Standardized Testing (SAT/ACT)</h2>
+            <div class="space-y-4">
+                <div>
+                    <span class="font-medium">Testing Status:</span>
+                    <label class="ml-4"><input type="radio" name="testingStatus" value="Complete" class="mr-1"> Complete</label>
+                    <label class="ml-4"><input type="radio" name="testingStatus" value="Planning to test again" class="mr-1"> Planning to test again</label>
+                </div>
+                <div>
+                    <label class="block font-medium mb-2">Upcoming Test Dates:</label>
+                    <div id="testDatesContainer" class="space-y-2">
+                        <input type="text" placeholder="Month YYYY" class="rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    </div>
+                    <button id="addTestDateBtn" class="mt-2 text-sm text-blue-600 hover:text-blue-800 font-semibold">+ Add another date</button>
+                </div>
+                <div class="flex items-start">
+                    <input id="explainedSendingScores" type="checkbox" class="custom-checkbox mt-1">
+                    <label for="explainedSendingScores" class="ml-3 font-medium text-gray-800">Explained how to send official scores (College Board / ACT website)</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Part 5: SCOIR Assignments -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 5: SCOIR Assignments</h2>
+            <div class="space-y-3 mb-4">
+                <div class="flex items-center"><input id="scoirBragSheet" type="checkbox" class="custom-checkbox mr-3"><label>Student Brag Sheet complete</label></div>
+                <div class="flex items-center"><input id="scoirSurvey" type="checkbox" class="custom-checkbox mr-3"><label>Teacher Recommendation Survey complete</label></div>
+                <div class="flex items-center"><input id="scoirRequests" type="checkbox" class="custom-checkbox mr-3"><label>Teacher LOR requests sent via SCOIR</label></div>
+            </div>
+            <div class="flex items-start">
+                <input id="explainedScoirDocs" type="checkbox" class="custom-checkbox mt-1">
+                <label for="explainedScoirDocs" class="ml-3 font-medium text-gray-800">Explained what documents we send (transcript, profile, counselor LOR) and when</label>
+            </div>
+        </div>
+
+        <!-- Part 6: Writing -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 6: Writing</h2>
+            <div class="space-y-4">
+                <div class="flex items-center flex-wrap">
+                    <label for="essayStatus" class="font-medium mr-2">Main Personal Statement Status:</label>
+                    <select id="essayStatus" class="rounded-md border-gray-300 shadow-sm">
+                        <option>Not Started</option> <option>Brainstorming</option> <option>Outlining</option> <option>First Draft</option> <option>Revising</option> <option>Near Final</option> <option>Complete</option>
+                    </select>
+                </div>
+                <div class="flex items-start">
+                    <input id="explainedSupplements" type="checkbox" class="custom-checkbox mt-1">
+                    <label for="explainedSupplements" class="ml-3 font-medium text-gray-800">Explained how to find supplemental essays in Common App</label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Part 7: College List -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                 <h2 class="text-xl font-semibold section-header">Part 7: College List & Deadlines</h2>
+                 <button id="loadSheetBtn" class="bg-green-600 text-white px-3 py-1.5 rounded-md text-sm font-semibold disabled:bg-gray-400" disabled>Load from Sheet</button>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">College Name</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Platform</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Deadline Type</th>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="collegeList" class="bg-white divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+            <button id="addCollegeBtn" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                Add College
+            </button>
+        </div>
+
+        <!-- Part 8 & 9... -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2 section-header">Part 8: Financial Aid & Other Components</h2>
+            <div class="space-y-3">
+                <div class="flex items-center"><input id="finAid" type="checkbox" class="custom-checkbox mr-3"><label>Family to begin gathering Financial Aid documents (FAFSA/CSS).</label></div>
+                <div class="flex items-center"><input id="portfolio" type="checkbox" class="custom-checkbox mr-3"><label>Confirm Portfolio/Audition deadlines (if applicable).</label></div>
+            </div>
+        </div>
+
+        <div id="athleteSection" class="bg-blue-50 p-6 rounded-lg shadow-md mb-8 hidden">
+            <h2 class="text-xl font-semibold mb-4 border-b border-blue-200 pb-2 text-blue-800">Part 9: Recruited Student-Athlete Checklist</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="block font-medium mb-2 text-gray-700">Schools student is actively in talks with:</label>
+                    <div id="athleteSchoolsContainer" class="space-y-2">
+                        <input type="text" placeholder="University Name" class="w-full rounded-md border-gray-300 shadow-sm sm:text-sm">
+                    </div>
+                    <button id="addAthleteSchoolBtn" class="mt-2 text-sm text-blue-600 hover:text-blue-800 font-semibold">+ Add another school</button>
+                </div>
+                <div class="flex items-center"><input id="athletePrereads" type="checkbox" class="custom-checkbox mr-3"><label>Discussed athletic pre-reads (completed or pending)</label></div>
+                <div class="flex items-center"><input id="athleteNcaa" type="checkbox" class="custom-checkbox mr-3"><label>Confirmed registration with NCAA Clearinghouse/Eligibility Center</label></div>
+                <div class="flex items-center"><input id="athleteVisits" type="checkbox" class="custom-checkbox mr-3"><label>Confirmed official/unofficial visit dates</label></div>
+            </div>
+        </div>
+
+        <!-- Summary & Submit Section -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4 border-b pb-2">Step 3: Finalize & Submit</h2>
+            <div class="mb-4">
+                <label for="notesLink" class="block font-medium">Link to AI Meeting Notes:</label>
+                <input type="url" id="notesLink" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" placeholder="https://...">
+            </div>
+            <button id="submitToDriveBtn" class="w-full bg-green-600 text-white px-6 py-3 rounded-md font-semibold text-lg disabled:bg-gray-400" disabled>
+                Submit to Google Drive
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal-overlay hidden"><div class="modal-content"><h3 id="modalTitle" class="text-lg font-bold mb-4"></h3><div id="modalBody" class="text-gray-700"></div><button id="closeModal" class="mt-6 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Close</button></div></div>
+
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- PASTE YOUR GOOGLE API CREDENTIALS HERE ---
+            const API_KEY = 'AIzaSyAqc2nwrjIYeMC95x6N2aRgyCECENsYi3I';
+            const CLIENT_ID = '1003298342261-9tmrdjmgkl9jkonch1u9k9clhn3e35d7.apps.googleusercontent.com';
+            // --- END OF CREDENTIALS ---
+
+            const DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest", "https://sheets.googleapis.com/$discovery/rest?version=v4"];
+            const SCOPES = 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets.readonly';
+
+            let tokenClient;
+            let gapiInited = false;
+            let gisInited = false;
+
+            const modal = document.getElementById('modal');
+            const authButton = document.getElementById('authorize_button');
+            const signoutButton = document.getElementById('signout_button');
+            const settingsPanel = document.getElementById('settings_panel');
+            const loadSheetBtn = document.getElementById('loadSheetBtn');
+            const submitToDriveBtn = document.getElementById('submitToDriveBtn');
+
+            // --- Core Google API Functions ---
+            function gapiLoaded() { gapi.load('client', initializeGapiClient); }
+            async function initializeGapiClient() {
+                await gapi.client.init({ apiKey: API_KEY, discoveryDocs: DISCOVERY_DOCS });
+                gapiInited = true;
+                maybeEnableButtons();
+            }
+            function gisLoaded() {
+                tokenClient = google.accounts.oauth2.initTokenClient({
+                    client_id: CLIENT_ID, scope: SCOPES, callback: '', // The callback is set per-request
+                });
+                gisInited = true;
+                maybeEnableButtons();
+            }
+            function maybeEnableButtons() {
+                if (gapiInited && gisInited) { authButton.style.visibility = 'visible'; }
+            }
+
+            authButton.onclick = () => {
+                tokenClient.callback = async (resp) => {
+                    if (resp.error !== undefined) { throw (resp); }
+                    gapi.client.setToken(resp);
+                    updateSigninStatus(true);
+                };
+                if (gapi.client.getToken() === null) {
+                    tokenClient.requestAccessToken({ prompt: 'consent' });
+                } else {
+                    tokenClient.requestAccessToken({ prompt: '' });
+                }
+            };
+            
+            signoutButton.onclick = () => {
+                const token = gapi.client.getToken();
+                if (token !== null) {
+                    google.accounts.oauth2.revoke(token.access_token);
+                    gapi.client.setToken('');
+                    updateSigninStatus(false);
+                }
+            };
+
+            function updateSigninStatus(isSignedIn) {
+                if (isSignedIn) {
+                    authButton.style.display = 'none';
+                    signoutButton.style.display = 'block';
+                    settingsPanel.style.display = 'grid';
+                    loadSheetBtn.disabled = false;
+                    submitToDriveBtn.disabled = false;
+                } else {
+                    authButton.style.display = 'block';
+                    signoutButton.style.display = 'none';
+                    settingsPanel.style.display = 'none';
+                    loadSheetBtn.disabled = true;
+                    submitToDriveBtn.disabled = true;
+                }
+            }
+            
+            // --- Google Sheets & Drive Logic ---
+            loadSheetBtn.onclick = async () => {
+                const sheetId = document.getElementById('sheetId').value;
+                if (!sheetId) { showModal("Error", "Please enter a Google Sheet ID."); return; }
+                
+                setLoadingState(loadSheetBtn, true);
+                try {
+                    const response = await gapi.client.sheets.spreadsheets.values.get({
+                        spreadsheetId: sheetId,
+                        range: 'A2:D', // Assumes data starts at A2, columns A-D
+                    });
+                    const rows = response.result.values || [];
+                    const collegeListBody = document.getElementById('collegeList');
+                    collegeListBody.innerHTML = ''; // Clear existing rows
+                    rows.forEach(row => createCollegeRow(row[0], row[1], row[2], row[3]));
+                } catch (err) {
+                    console.error(err);
+                    showModal("Error", `Could not load sheet data. Check the Sheet ID and sharing permissions. Details: ${err.result.error.message}`);
+                } finally {
+                    setLoadingState(loadSheetBtn, false);
+                }
+            };
+
+            submitToDriveBtn.onclick = async () => {
+                const folderId = document.getElementById('driveFolderId').value;
+                const studentName = document.getElementById('studentName').value;
+                if (!folderId || !studentName) {
+                    showModal("Error", "Please enter a Student Name and a Google Drive Folder ID.");
+                    return;
+                }
+                
+                setLoadingState(submitToDriveBtn, true);
+                const fileContent = generateFileContent();
+                const fileName = `${studentName} - ${document.getElementById('meetingDate').value} Checklist.txt`;
+                
+                const metadata = { name: fileName, parents: [folderId], mimeType: 'text/plain' };
+                const requestBody = new Blob([fileContent], { type: 'text/plain' });
+
+                try {
+                    const response = await gapi.client.drive.files.create({
+                        resource: metadata,
+                        media: { body: requestBody },
+                        fields: 'id'
+                    });
+                    showModal("Success!", `File "${fileName}" was created successfully in your Google Drive folder.`);
+                } catch (err) {
+                    console.error(err);
+                    showModal("Error", `Could not create file. Check the Folder ID and permissions. Details: ${err.result.error.message}`);
+                } finally {
+                    setLoadingState(submitToDriveBtn, false);
+                }
+            };
+            
+            function generateFileContent() {
+                let content = `Senior College Application Meeting\n`;
+                content += `-------------------------------------\n`;
+                content += `Student: ${document.getElementById('studentName').value}\n`;
+                content += `Date: ${document.getElementById('meetingDate').value}\n\n`;
+                
+                // Helper to get checkbox status
+                const getStatus = (id) => document.getElementById(id).checked ? '[X]' : '[ ]';
+
+                content += `## Logistics & Common App ##\n`;
+                content += `${getStatus('standingMeeting')} Standing Senior Meeting Scheduled\n`;
+                content += `${getStatus('commonAppPreview')} Common App Preview Enabled\n`;
+                content += `${getStatus('commonAppSections')} Reviewed Application Sections\n\n`;
+
+                content += `## Writing ##\n`;
+                content += `Personal Statement Status: ${document.getElementById('essayStatus').value}\n`;
+                content += `${getStatus('explainedSupplements')} Explained how to find supplemental essays\n\n`;
+
+                // Add more sections as needed...
+                content += `## College List ##\n`;
+                const collegeRows = document.querySelectorAll('#collegeList tr');
+                collegeRows.forEach(row => {
+                    const inputs = row.querySelectorAll('input, select');
+                    content += `- ${inputs[0].value} (${inputs[2].value} - ${inputs[3].value})\n`;
+                });
+
+                content += `\n## AI Notes Link ##\n${document.getElementById('notesLink').value}\n`;
+                return content;
+            }
+
+            // --- General UI & Utility Functions ---
+            const showModal = (title, message) => {
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalBody').innerHTML = message;
+                modal.classList.remove('hidden');
+            };
+            document.getElementById('closeModal').addEventListener('click', () => modal.classList.add('hidden'));
+
+            const setLoadingState = (button, isLoading) => {
+                const originalText = button.dataset.originalText || button.innerText;
+                if (isLoading) {
+                    button.dataset.originalText = originalText;
+                    button.disabled = true;
+                    button.innerHTML = originalText + '<span class="loader"></span>';
+                } else {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }
+            };
+
+            const createCollegeRow = (name='', platform='', type='', date='') => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="px-4 py-2"><input type="text" value="${name}" placeholder="University Name" class="w-full rounded-md border-gray-300 text-sm"></td>
+                    <td class="px-4 py-2"><input type="text" value="${platform}" placeholder="Common App" class="w-full rounded-md border-gray-300 text-sm"></td>
+                    <td class="px-4 py-2">
+                        <select class="w-full rounded-md border-gray-300 text-sm">
+                            <option ${type==='RD'?'selected':''}>RD</option><option ${type==='ED'?'selected':''}>ED</option><option ${type==='EA'?'selected':''}>EA</option><option ${type==='REA'?'selected':''}>REA</option><option ${type==='Rolling'?'selected':''}>Rolling</option>
+                        </select>
+                    </td>
+                    <td class="px-4 py-2"><input type="date" value="${date}" class="w-full rounded-md border-gray-300 text-sm"></td>
+                    <td class="px-4 py-2 text-right"><button class="remove-btn text-red-500 hover:text-red-700 font-semibold">Remove</button></td>
+                `;
+                document.getElementById('collegeList').appendChild(row);
+                row.querySelector('.remove-btn').addEventListener('click', () => row.remove());
+            };
+            
+            const addInputField = (container, placeholder) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = placeholder;
+                input.className = 'w-full rounded-md border-gray-300 shadow-sm sm:text-sm';
+                container.appendChild(input);
+            };
+
+            // Initial setup
+            document.getElementById('meetingDate').value = new Date().toISOString().split('T')[0];
+            createCollegeRow();
+            document.getElementById('addCollegeBtn').addEventListener('click', () => createCollegeRow());
+            document.getElementById('isAthlete').addEventListener('change', (e) => {
+                document.getElementById('athleteSection').classList.toggle('hidden', !e.target.checked);
+            });
+            document.getElementById('addTestDateBtn').addEventListener('click', () => addInputField(document.getElementById('testDatesContainer'), 'Month YYYY'));
+            document.getElementById('addAthleteSchoolBtn').addEventListener('click', () => addInputField(document.getElementById('athleteSchoolsContainer'), 'University Name'));
+
+            // Load Google API scripts
+            const gapiScript = document.createElement('script');
+            gapiScript.src = 'https://apis.google.com/js/api.js';
+            gapiScript.onload = gapiLoaded;
+            document.body.appendChild(gapiScript);
+
+            const gisScript = document.createElement('script');
+            gisScript.src = 'https://accounts.google.com/gsi/client';
+            gisScript.onload = gisLoaded;
+            document.body.appendChild(gisScript);
+        });
+    </script>
+</body>
+</html>
